@@ -4,6 +4,20 @@ Fetch an X (Twitter) handle's recent tweets via DuckDuckGo search — no API
 key needed. Results are search-indexed and approximate, not a live timeline
 read.
 
+**Runs locally only.** DuckDuckGo (and the other engines this aggregates
+across) blocks requests from cloud/datacenter IPs far more aggressively than
+home connections, so this reliably works on your own machine but not when
+deployed to a cloud host (Render, Railway, Fly.io, etc. all hit the same
+block). There is no public hosted link — everyone who wants to use this
+needs to clone and run it themselves, as below.
+
+## Get the code
+
+```
+git clone https://github.com/rekha509/x-tweet-agent.git
+cd x-tweet-agent
+```
+
 ## Setup
 
 ```
@@ -21,21 +35,19 @@ CLI:
 python agent.py jack --count 3
 ```
 
-Web app + API (serves the search page at `/`, and `GET /tweets/{handle}`):
-
-```
-uvicorn api:app --host 0.0.0.0 --port 8080
-```
-
-or, equivalently:
+Web app (search page + API, at `http://localhost:8080/`):
 
 ```
 python api.py
 ```
 
-`api.py` reads the port from the `PORT` env var (default `8080`) and binds to
-`0.0.0.0`, so it's ready to deploy as-is (e.g. Render: build command
-`pip install -r requirements.txt`, start command `python api.py`).
+or, equivalently:
 
-The SQLite cache defaults to a file in the OS temp directory, since some
-hosts' app directories are read-only or wiped between deploys.
+```
+uvicorn api:app --host 0.0.0.0 --port 8080
+```
+
+`api.py` reads the port from the `PORT` env var (default `8080`) if you want
+to run it on a different port.
+
+The SQLite cache defaults to a file in the OS temp directory.
