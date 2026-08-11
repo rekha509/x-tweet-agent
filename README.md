@@ -4,12 +4,15 @@ Fetch an X (Twitter) handle's recent tweets via DuckDuckGo search — no API
 key needed. Results are search-indexed and approximate, not a live timeline
 read.
 
-**Runs locally only.** DuckDuckGo (and the other engines this aggregates
-across) blocks requests from cloud/datacenter IPs far more aggressively than
-home connections, so this reliably works on your own machine but not when
-deployed to a cloud host (Render, Railway, Fly.io, etc. all hit the same
-block). There is no public hosted link — everyone who wants to use this
-needs to clone and run it themselves, as below.
+**Must run on your own machine, not a cloud host.** DuckDuckGo (and the other
+engines this aggregates across) blocks requests from cloud/datacenter IPs far
+more aggressively than home connections, so this reliably works locally but
+not when deployed to Render, Railway, Fly.io, etc. — they all hit the same
+block. There's no permanent hosted link because of this. There IS a way to
+get a temporary public link without deploying anywhere: see "Share a public
+link" below — the app still runs on your machine (so its outbound searches
+use your normal home IP, not a blocked one), a Cloudflare Tunnel just forwards
+public internet traffic to it.
 
 ## Get the code
 
@@ -51,3 +54,33 @@ uvicorn api:app --host 0.0.0.0 --port 8080
 to run it on a different port.
 
 The SQLite cache defaults to a file in the OS temp directory.
+
+## Share a public link (temporary)
+
+Double-click `start.bat`. It starts the app on port 8080 and opens a
+[Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/trycloudflare/)
+(no account, no login) pointing at it, in two separate windows.
+
+Look in the "Public Link" window for a line like:
+
+```
+https://some-random-words.trycloudflare.com
+```
+
+That's the link to share. Two things to know:
+
+- **The URL is random and changes every time** you run `start.bat` — it's a
+  new "quick tunnel" each run, not a fixed address.
+- **The link only works while both windows from `start.bat` stay open.**
+  Closing either one (or shutting down your machine) takes the link down.
+  Run `start.bat` again to get a new one.
+
+`start.bat` expects `cloudflared.exe` in this same folder — it's not committed
+to the repo (Windows-only binary), so if it's missing, download it with:
+
+```
+curl -L -o cloudflared.exe https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe
+```
+
+`start.bat` also depends on setup above having been done first (`pip install
+-r requirements.txt`).
